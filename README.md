@@ -14,6 +14,8 @@ Each worker completes it's activity then asks for the 'next' available to work. 
 
 This 'unit-of-work' could as well be driving a chrome browser or other computationally intensive tasks. 
 
+note - if workers exceed amount of work to be done, workers will initialize with duplicate workloads.   recommend the pattern of setting the workers to length in that case
+
 
 ## installation
 
@@ -34,14 +36,18 @@ function randomIntFromInterval(min: number, max: number): number {
     // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
+const MAX_WORKERS = 5;
+
+// 1, 2, 3, ... 150
+const arrayOfWork = Array.from(Array(150).keys());
 
 const source = distribute(
-    fromIter([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]),
+    fromIter(arrayOfWork),
 );
 
-const WORKERS = 5;
+const DYNAMIC_WORKERS = arrayOfWork.length < MAX_WORKERS ? arrayOfWork.length : MAX_WORKERS;
 
-for (let step = 0; step < WORKERS; step++) {
+for (let step = 0; step < DYNAMIC_WORKERS; step++) {
     source(
         0,
         makeWorker(
