@@ -47,7 +47,7 @@ for (let step = 0; step < DYNAMIC_WORKERS; step++) {
         }),
     );
 }
-Promise.all(workComplete).then(_ => {
+Promise.all(workComplete).then(() => {
     console.timeEnd(`test ${arrayOfWork.length} across ${DYNAMIC_WORKERS} workers`);
     console.log(`\nfinal result\n`, processed);
     const original = arrayOfWork.slice().sort((a, b) => a - b);

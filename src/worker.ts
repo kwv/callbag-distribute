@@ -1,12 +1,12 @@
 import { START, DATA, END, Callbag } from './index';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const uuidv1 = require('uuid/v1');
 
+import { v1 as uuidv1 } from 'uuid';
 function logger(val: string): void {
     process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'dev' ? console.log(val) : undefined;
 }
 export function makeWorker(
-    workFunction: (arg0: any) => Promise<any>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    workFunction: (arg0: Callbag | any) => Promise<void>,
     callback: (arg0: string) => void,
     myId = uuidv1(),
 ): Callbag {
