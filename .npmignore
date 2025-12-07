@@ -1,6 +1,4 @@
-.vscode
-.eslintignore
-.eslintrc.js
+
 .prettierrc.js
 tsconfig.json
 src/*
