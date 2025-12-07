@@ -9,6 +9,7 @@ function randomIntFromInterval(min: number, max: number): number {
 
 const MAX_WORKERS = 20;
 const arrayOfWork = Array.from(Array(21).keys());
+// @ts-expect-error - callbag types mismatch with third party library
 const source = distribute(fromIter(arrayOfWork));
 const workComplete: Array<Promise<string>> = [];
 

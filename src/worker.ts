@@ -6,11 +6,11 @@ function logger(val: string): void {
 }
 export function makeWorker(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    workFunction: (arg0: Callbag | any) => Promise<void>,
+    workFunction: (arg0: any) => Promise<void>,
     callback: (arg0: string) => void,
     myId = randomUUID(),
 ): Callbag {
-    let talkback;
+    let talkback: Callbag | undefined;
 
     // don't mutate the id; in dev mode we can optionally log it instead
     if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'dev') {
@@ -27,10 +27,10 @@ export function makeWorker(
     // us sending talkback 1 could result in a type 2 message (only)
     let busy = false;
     const start = process.hrtime();
-    return function sink(type: START | DATA | END, data: Callbag | unknown): void {
+    return function sink(type: START | DATA | END, data: unknown): void {
         if (type === 0) {
             logger(`{worker: '${myId}', time:'${process.hrtime(start)}', event: 'handshake'}`);
-            talkback = data;
+            talkback = data as Callbag;
             //asking for first data
             // eslint-disable-next-line prettier/prettier
             logger(`{worker: '${myId}', time:'${process.hrtime(start)}', event: 'handshake done...  asking for first '}`);
@@ -46,10 +46,12 @@ export function makeWorker(
                         `{worker: '${myId}', time:'${process.hrtime(start)}', event: 'ending/next', value:' ${data}'}`,
                     );
                 })
-                .catch()
+                .catch(() => {
+                    // verify catch needs argument?
+                })
                 .finally(() => {
                     if (hasMore) {
-                        talkback(1);
+                        if (talkback) talkback(1);
                     } else {
                         logger(
                             `{worker: '${myId}', time:'${process.hrtime(start)}', event: 'finished', value:' ${data}'}`,

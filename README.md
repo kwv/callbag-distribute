@@ -3,18 +3,47 @@
 Callbag operator that broadcasts a single source to multiple sinks. Does reference counting on sinks and starts the source when the first sink gets connected, similar to RxJS [`.share()`](https://www.learnrxjs.io/operators/multicasting/share.html). Works on either pullable or listenable sources. Distributes on data requests one at a time.
 
 
+## How it works
+
+The `distribute` operator acts as a load balancer. It distributes data items from a single source to multiple sinks (workers). When a sink requests data, `distribute` forwards that request to the source. When the source emits data, `distribute` routes it specifically to the sink that requested it.
+
+```mermaid
+sequenceDiagram
+    participant Source
+    participant Distribute
+    participant Worker1
+    participant Worker2
+
+    Note over Worker1, Distribute: 1. Worker joins
+    Worker1->>Distribute: Handshake (0)
+    Distribute->>Source: Handshake (0)
+
+    Note over Worker1: 2. Worker asks for data
+    Worker1->>Distribute: Request (1)
+    Distribute->>Source: Request (1)
+    Source->>Distribute: Data (1)
+    Distribute->>Worker1: DataPayload (1)
+
+    Note over Worker2: 3. Another Worker joins
+    Worker2->>Distribute: Handshake (0)
+   
+    Note over Worker2: 4. Second Worker asks
+    Worker2->>Distribute: Request (1)
+    Distribute->>Source: Request (1)
+    Source->>Distribute: Data (1)
+    Distribute->>Worker2: DataPayload (1)
+```
+
 ## Usages
-as depicted below, helpful for a Task Queue -> Task runner pattern.  when used with fromIter and array, it can be used to push each element into it's own task runner.  
+This pattern is ideal for a **Task Queue -> Task Runner** architecture. 
+For example, using `fromIter` with an array of tasks, you can have multiple workers pulling tasks as they complete their previous work.
 
-`makeWorker` takes three arguments, a Promise (unit of work), a callback when the queue / worker is exhausted, and an optional Id for logging.
+`makeWorker` takes three arguments:
+1. A Promise-returning function (unit of work)
+2. A callback for when the queue/worker is exhausted
+3. An optional ID for logging
 
-when ran as `NODE_ENV=dev` emits details of the queue processing.  
-
-Each worker completes it's activity then asks for the 'next' available to work.  for the purposes of demonstration -- in the sample code below the task is an indeterminate SetTimeout.
-
-This 'unit-of-work' could as well be driving a chrome browser or other computationally intensive tasks. 
-
-note - if workers exceed amount of work to be done, workers will initialize with duplicate workloads.   recommend the pattern of setting the workers to length in that case
+When ran with `NODE_ENV=dev`, detailed logs of the queue processing are emitted.
 
 
 ## installation
