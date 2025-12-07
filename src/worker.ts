@@ -1,6 +1,6 @@
 import { START, DATA, END, Callbag } from './index';
 
-import { v1 as uuidv1 } from 'uuid';
+import { randomUUID } from 'crypto';
 function logger(val: string): void {
     process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'dev' ? console.log(val) : undefined;
 }
@@ -8,11 +8,14 @@ export function makeWorker(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     workFunction: (arg0: Callbag | any) => Promise<void>,
     callback: (arg0: string) => void,
-    myId = uuidv1(),
+    myId = randomUUID(),
 ): Callbag {
     let talkback;
 
-    process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'dev' ? myId++ : undefined;
+    // don't mutate the id; in dev mode we can optionally log it instead
+    if (process.env.NODE_ENV && process.env.NODE_ENV.trim() === 'dev') {
+        logger(`worker id: ${myId}`);
+    }
 
     // hack city.  continue to ask for more until hasMore is false.
     // another worker could have requested one while this worker is busy
