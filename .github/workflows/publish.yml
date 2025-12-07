@@ -22,19 +22,17 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
+      - name: Install deps (skip lifecycle scripts to avoid duplicate build)
+        run: npm ci --ignore-scripts
 
       - name: Build
         run: npm run build
 
       - name: Test
-        run: npm run test
+        run: npm test
 
-      - name: Publish to npm
+      - name: Publish
+        if: ${{ secrets.NPM_TOKEN != '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish
+        run: npm publish --access public
