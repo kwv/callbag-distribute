@@ -1,6 +1,6 @@
 {
   "name": "callbag-distribute",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "callbag that distributes (shared) sources to many sinks",
   "main": "dist/index.cjs.js",
   "module": "dist/index.mjs",
