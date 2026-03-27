@@ -2,14 +2,14 @@
   "name": "callbag-distribute",
   "version": "2.0.1",
   "description": "callbag that distributes (shared) sources to many sinks",
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.cts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs.js",
-      "default": "./dist/index.cjs.js"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsdown src/**/*.ts --format cjs,esm --dts --out-dir dist",
     "build:watch": "tsdown --watch src/**/*.ts --format cjs,esm --dts --out-dir dist",
-    "test": "npm run build && node dist/index.spec.js",
+    "test": "npm run build && node dist/index.spec.cjs",
     "prepare": "npm run build",
     "prepublishOnly": "npm test"
   },
